@@ -3,6 +3,28 @@ import os
 import psycopg2
 
 app = Flask(__name__)
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World from Abhinavsai Parsi in 3308'
+
+
+@app.route('/db_test')
+def db_test():
+    conn = None
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        return "Database Connection Successful"
+    except Exception as e:
+        return f"Database Connection Failed: {e}"
+    finally:
+        if conn:
+            conn.close()
+
+
 @app.route('/db_create')
 def db_create():
     conn = None
@@ -79,12 +101,12 @@ def db_select():
         cur.execute("SELECT * FROM Basketball;")
         records = cur.fetchall()
 
-        response_string = "<table>"
+        response_string = "<table border='1'>"
 
         for player in records:
             response_string += "<tr>"
             for info in player:
-                response_string += "<td>{}</td>".format(info)
+                response_string += f"<td>{info}</td>"
             response_string += "</tr>"
 
         response_string += "</table>"
@@ -123,3 +145,7 @@ def db_drop():
             cur.close()
         if conn:
             conn.close()
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
